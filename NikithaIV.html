@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pie Chart Example using sequential color map</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
+    <h1>Year-wise Gold rate in India</h1>
+    <script>
+      // Defining the data
+      const data = [
+        { year: "2010", value: 100 },
+        { year: "2011", value: 220 },
+        { year: "2012", value: 297 },
+        { year: "2013", value: 698 },
+        { year: "2014", value: 350 },
+        { year: "2015", value: 490 },
+        { year: "2016", value: 685 },
+        { year: "2017", value: 980 },
+        { year: "2018", value: 870 },
+        { year: "2019", value: 793 }
+      ];
+      const width = 500;
+      const height = 900;
+      const radius = Math.min(width, height) / 2;
+
+      // Defining the sequential color scale
+      const color = d3.scaleSequential()
+        .domain([0, d3.max(data, d => d.value)])
+        .interpolator(d3.interpolateBlues);
+      const svg = d3.select("body")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", `translate(${width / 2}, ${height / 2})`);
+      const pie = d3.pie()
+        .value(d => d.value)
+        .sort(null);
+      const arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius);
+
+      // Drawing the slices
+      const slices = svg.selectAll("path")
+        .data(pie(data))
+        .enter()
+        .append("path")
+        .attr("d", arc)
+        .attr("fill", d => color(d.data.value));
+
+      // Adding labels to the slices
+      const labels = svg.selectAll("text")
+        .data(pie(data))
+        .enter()
+        .append("text")
+        .attr("transform", d => `translate(${arc.centroid(d)})`)
+        .attr("text-anchor", "middle")
+        .text(d => d.data.year);
+
+      // Adding a color key
+      const colorKey = svg.append("g")
+        .attr("class", "legend")
+        .attr("transform", `translate(${-width / 2 + 20}, ${-height / 2 + 20})`);
+
+      colorKey.selectAll("rect")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", (d, i) => i * 20)
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("fill", d => color(d.value));
+
+      colorKey.selectAll("text")
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("x", 15)
+        .attr("y", (d, i) => i * 20 + 10)
+        .text(d => `${d.year}: ${d.value}`)
+        .attr("text-anchor", "start")
+		</script>
+		</body>
+</html>
